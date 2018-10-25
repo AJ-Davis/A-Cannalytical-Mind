@@ -1,0 +1,162 @@
+<html>
+
+  <head>
+    <link rel='stylesheet' type='text/css' href='/static/css/style.css?4884491531257'/>
+  <head>
+
+  <body>
+    <div class="title">
+    Target Toker Detector
+    </div>
+  <br>
+
+    <header>
+      <h1>Are you in good health?
+      <select id="Health">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </h1>
+  </header>
+
+  <header>
+    <h1>Are you currently enrolled in school?
+
+      <select id="Enrolled">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </h1>
+  </header>
+
+  <header>
+    <h1>
+      Are you Caucasion?
+
+      <select id="Ethnicity1">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      </h1>
+    </header>
+
+  <header>
+    <h1>Do you make more than $10,000 per year?
+      <select id="Income">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </h1>
+  </header>
+
+  <header>
+    <h1>Are you a college graduate?
+      <select id="Education1">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </h1>
+  </header>
+
+  <header>
+    <h1>Have you ever been married?
+      <select id="Marital_Status1">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </h1>
+  </header>
+
+  <header>
+    <h1>Are you between the age of 35 and 49?
+      <select id="Age">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </h1>
+  </header>
+
+  <header>
+    <h1>Are you African American?
+      <select id="Ethnicity2">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </h1>
+  </header>
+
+  <header>
+    <h1>Are you currently married?
+      <select id="Marital_Status2">
+        <option value="Yes'">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </h1>
+  </header>
+
+  <header>
+    <h1>Are you a high school graduate?
+      <select id="Education2">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </h1>
+  </header>
+<br>
+
+
+
+      <div>
+        <button id="submit">Make prediction</button>
+      </div>
+
+      <div>
+        You are <span id="hard_predict"></span> (target toker probability is <b><span id="soft_predict"></span>%</b>).
+      </div>
+
+      </div>
+  </body>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>
+
+    $('#submit').click( () => { cool(); } );
+    ['Health',  'Enrolled', 'Ethnicity1', 'Income', 'Education1',
+                             'Marital_Status1', 'Age', 'Ethnicity2', 'Marital_Status2',
+                             'Education2']
+    function cool(){
+
+      let features = {
+        'Health': $('#Health').val(),
+        'Enrolled': $('#Enrolled').val(),
+        'Ethnicity1': $('#Ethnicity1').val(),
+        'Income': $('#Income').val(),
+        'Education1': $('#Education1').val(),
+        'Marital_Status1': $('#Marital_Status1').val(),
+        'Age': $('#Age').val(),
+        'Ethnicity2': $('#Ethnicity2').val(),
+        'Marital_Status2': $('#Marital_Status2').val(),
+        'Education2': $('#Education2').val()
+      }
+      console.log(features);
+
+      $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: "/predict",  // Replace with URL of POST handler
+        dataType: "json",
+        async: true,
+        data: JSON.stringify(features),
+        success: (result) => {
+          $('#hard_predict').html(result['prediction'] ? 'a target toker' : 'not a target toker' );
+          $('#soft_predict').html(result['prob_target_toker']);
+        },
+        error: (result) => {
+          alert('I dunno what you did');
+        }
+      })
+
+    }
+
+    </script>
+
+</html>

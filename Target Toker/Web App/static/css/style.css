@@ -1,0 +1,72 @@
+/* This is our stylesheet */
+body {
+  background: #dedede;
+  color: #99999999;
+  font-size: 36pt;
+}
+
+.header{
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  font-size: 10pt;
+}
+
+.title{
+  text-shadow: 0 1px 0 #ccc,
+               0 2px 0 #c9c9c9,
+               0 3px 0 #bbb,
+               0 4px 0 #b9b9b9,
+               0 5px 0 #00FF00,
+               0 6px 1px rgba(0,0,0,.1),
+               0 0 5px rgba(0,0,0,.1),
+               0 1px 3px rgba(0,0,0,.3),
+               0 3px 5px rgba(0,0,0,.2),
+               0 5px 10px rgba(0,0,0,.25),
+               0 10px 10px rgba(0,0,0,.2),
+               0 20px 20px rgba(0,0,0,.15);
+}
+
+
+
+.pick button{
+  background-color: #8888EE;
+  color: white;
+  font-size: 36pt;
+  border-radius: 10px;
+}
+
+
+
+
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,900);
+
+body {
+  background:
+    linear-gradient(
+      rgba(0, 0, 0, 0.5),
+      rgba(0, 0, 0, 0.5)
+    ),
+    url(https://i1.wp.com/fondos-animados.com/gifs/fondos-rihanna.gif?fit=500%2C371);
+  background-size: cover;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+header {
+
+  top: 50%;
+  left: 80%;
+  transform: translate(-50%, -50%);
+  color: white;
+  text-align: right;
+}
+h1 {
+
+  margin: 10;
+  padding-left: 0;
+  font-size: 26;
+  white-space: nowrap;
+}
+p {
+  margin: 0;
+  font-size: 1.5rem;
