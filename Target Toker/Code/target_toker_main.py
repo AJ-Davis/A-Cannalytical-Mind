@@ -10,13 +10,12 @@ Created on Tue Jul 24 15:38:46 2018
 # Import relevant libraries helper functions
 # =============================================================================
 import sys
-sys.path.insert(0, '/Users/ajdavis/Desktop/Github/A-Cannalytical-Mind/Target Toker/Code')
+sys.path.insert(0, '/Users/ajdavis/Github/A-Cannalytical-Mind/Target Toker/Code')
 
 from target_toker_helper import *
 
 ## Read in data 
-df = pd.read_stata('/Users/ajdavis/Desktop/Github/A-Cannalytical-Mind/Target Toker/Data/SAMHDA.dta')
-
+df = pd.read_stata('/Users/ajdavis/GitHub/A-Cannalytical-Mind/Target Toker/Data/SAMHDA.dta')
 
 # Select relevant columns based on review of the survey codebook
 feature_space = ['pnrnmlif', 'mrdaypyr', 'mjever', 'mjrec', 'mjyrtot', 'service', 'health', 
@@ -102,7 +101,7 @@ ax = ax.rename(index={'NEWRACE2_NonHisp_White':'Caucasian',
 
 ax = ax.plot.barh(title='Target Toker Profile')
 fig = ax.get_figure()
-fig.savefig('/Users/ajdavis/Desktop/Github/A-Cannalytical-Mind/Target Toker/Images/profile.jpg', bbox_inches = 'tight')
+fig.savefig('/Users/ajdavis/Github/A-Cannalytical-Mind/Target Toker/Images/profile.jpg', bbox_inches = 'tight')
 
 
 # Subset data to only include top features
@@ -124,31 +123,31 @@ X_smoted_train_select_scaled = ssX.fit_transform(X_smoted_train_select)
 X_smoted_test_select_scaled = ssX.transform(X_smoted_test_select)
 
 # Loop through all relevant models, tune, and score
-grids = score_ht_models(X_smoted_train_select_scaled, y_smoted_train, scoring = 'recall')
+grids = score_ht_models(X_smoted_train_select_scaled, y_smoted_train, scoring = 'f1')
 
-# Score models that I am not hyperparameter tuning
-# Also check for impact over baseline (Dummy Classifier)
-scores_other = score_models(X_smoted_train_select_scaled, y_smoted_train, scoring = 'recall')
+# Pickle the model results for future use
+pickle.dump(grids, open('/Users/ajdavis/Github/A-Cannalytical-Mind/Target Toker/Results/grids.pkl', 'wb'))
+grids = pickle.load(open('/Users/ajdavis/Github/A-Cannalytical-Mind/Target Toker/Results/grids.pkl', 'rb'))
 
+# Plot ROCs
+fig = plot_rocs(grids, y_smoted_test, X_smoted_test_select_scaled)
+fig.savefig('/Users/ajdavis/Github/A-Cannalytical-Mind/Target Toker/Images/roc.jpg', bbox_inches = 'tight')
 
-
-# Score best model on test data to check for overfitting
-grids['tree'].best_estimator_.score(X_smoted_test_select_scaled, y_smoted_test)
-grids['forest'].best_estimator_.score(X_smoted_test_select_scaled, y_smoted_test)
-grids['svc'].best_estimator_.score(X_smoted_test_select_scaled, y_smoted_test)
 
 # Check confusion matrix and classification report for best model
 y_pred_test = grids['forest'].best_estimator_.predict(X_smoted_test_select_scaled)
 y_pred_train = grids['forest'].best_estimator_.predict(X_smoted_train_select_scaled)
 
-y_pred_test = grids['svc'].best_estimator_.predict(X_smoted_test_select_scaled)
-y_pred_train = grids['svc'].best_estimator_.predict(X_smoted_train_select_scaled)
+y_pred_test = grids['xgb'].best_estimator_.predict(X_smoted_test_select_scaled)
+y_pred_train = grids['xgb'].best_estimator_.predict(X_smoted_train_select_scaled)
 
 conf_mat_test = confusion_matrix(y_true=y_smoted_test, y_pred=y_pred_test)
 conf_mat_train = confusion_matrix(y_true=y_smoted_train, y_pred=y_pred_train)
 
-cm_test = print_confusion_matrix(conf_mat_test, ['Class 0', 'Class 1'])
-cm_train = print_confusion_matrix(conf_mat_train, ['Class 0', 'Class 1'])
+cm_test = print_confusion_matrix(conf_mat_test, ['Non-Target Toker', 'Target Toker'])
+cm_test.savefig('/Users/ajdavis/Github/A-Cannalytical-Mind/Target Toker/Images/cm_test.jpg', bbox_inches = 'tight')
+
+cm_train = print_confusion_matrix(conf_mat_train, ['Non-Target Toker', 'Target Toker'])
 
 cr_test = classification_report(y_smoted_test,y_pred_test)
 cr_train = classification_report(y_smoted_train,y_pred_train)
@@ -172,6 +171,6 @@ X_smoted_select.columns = ['Health',  'Enrolled', 'Ethnicity1', 'Income', 'Educa
 pipeline.fit(X_smoted_select,y_smoted)
 
 # Save model
-pickle.dump(pipeline, open('/Users/ajdavis/Desktop/Github/A-Cannalytical-Mind/Target Toker/Web App/model.pkl', 'wb'))
+pickle.dump(pipeline, open('/Users/ajdavis/Github/A-Cannalytical-Mind/Target Toker/Web App/model.pkl', 'wb'))
 
 

@@ -19,6 +19,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import precision_score, recall_score, accuracy_score, roc_auc_score
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import roc_curve
+from sklearn.metrics import auc
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn import svm
@@ -43,6 +45,7 @@ from sklearn.neighbors  import KNeighborsClassifier as KNN
 from imblearn.over_sampling import SMOTE
 from collections import Counter
 from sklearn.metrics import classification_report
+import xgboost as xgb
 
 
 ## General Data Processing and Feature Engineering
@@ -164,10 +167,9 @@ def score_ht_models(X, y, scoring = 'accuracy'):
               ('tree', DecisionTreeClassifier),
               ('forest', RandomForestClassifier),
               ('svc', svm.SVC),
-              ('Bagging Classifier', BaggingClassifier(base_estimator=DecisionTreeClassifier())),
-              ('SGD-Log', SGDClassifier(loss='log'))
-              ('Naive Bayes', naive_bayes.BernoulliNB()),
-              ('Dummy', DummyClassifier(strategy='stratified'))
+              ('xgb', xgb.XGBClassifier),
+              ('SGD-Log', SGDClassifier),
+              ('Naive Bayes', naive_bayes.BernoulliNB)
              ]
     
     param_choices = [
@@ -180,11 +182,11 @@ def score_ht_models(X, y, scoring = 'accuracy'):
         },
         {
             'max_depth': [1,2,3,4,5],
-            'min_samples_leaf': [3,6,10]
+            'min_samples_leaf': [3,6]
         },
         {
             'n_estimators': [50, 100, 200],
-            'max_depth': [1, 5, 10, 15, 20, 25, 30],
+            'max_depth': [1, 5, 10, 20],
             'min_samples_leaf': [1,2,4,6,10]
         },
         {
@@ -192,12 +194,18 @@ def score_ht_models(X, y, scoring = 'accuracy'):
             'gamma': [1, 2, 4, 10, 20, 50]
         },
         {
-            'n_estimators': [100],
-            'n_jobs': [-1]
+             "objective": ["binary:logistic"],
+             'min_child_weight': [1, 5],
+             'subsample': [0.8, 1],
+             'gamma': [0.5, 2],
+             'colsample_bytree': [0.8, 1],
+             'learning_rate': [0.3],
+             'max_depth': [4, 5], 
+             'reg_alpha': [5],
+             'n_jobs': [-1]
         },
         {
-        },
-        {
+            'loss': ["log"]
         },
         {
         }
@@ -212,40 +220,7 @@ def score_ht_models(X, y, scoring = 'accuracy'):
         s = f"{name}: best score: {grid.best_score_}"
         print(s)
         grids[name] = grid
-    return grids
-      
-
-def score_models(X, y, folds = 5, alpha = 0.5, scoring = 'accuracy',
-               n_neighbors = 5, C = 5, kernal = 'rbf'): 
-    
-    models = {}
-    parameters = {}
-    
-    models['Bagging Classifier'] = BaggingClassifier(base_estimator=DecisionTreeClassifier(),n_estimators=100, n_jobs=-1)
-    models['SGD-Log'] = SGDClassifier(loss='log')
-    models['Naive Bayes'] = naive_bayes.BernoulliNB()
-    models['Linear SVC'] = LinearSVC()
-    models['Dummy'] = DummyClassifier(strategy='stratified')
-    
-    X_c, y_c = check_X_y(X, y)
-    
-    score_list = []
-    for name,model in models.items():
-        if name == 'Dummy':
-            scores = model_selection.cross_val_score(model, X_c, y_c, 
-                                                     cv = folds, n_jobs=1,
-                                                     scoring = scoring) 
-        else:
-            scores = model_selection.cross_val_score(model, X, y, 
-                                         cv = folds, n_jobs=1,
-                                         scoring = scoring) 
-            
-        score_list.append(np.mean(scores))
-    
-    scores_df = pd.DataFrame({'Model': list(models.keys()),
-                             'Scores': score_list})
-    
-    return scores_df    
+    return grids       
 
 
 def make_prediction(features):
@@ -296,10 +271,31 @@ def print_confusion_matrix(confusion_matrix, class_names, figsize = (10,7), font
         raise ValueError("Confusion matrix values must be integers.")
     heatmap.yaxis.set_ticklabels(heatmap.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=fontsize)
     heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=45, ha='right', fontsize=fontsize)
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
+
     return fig
 
 
-
-
+        
+def plot_rocs(grids, y, X):
+    roc_plotting_stuff = []
+    for key, value in grids.items():
+        try:
+            y_predict_proba = grids[key].best_estimator_.predict_proba(X).tolist()
+        except Exception as e:
+            print(e)
+        probabilities = np.array(y_predict_proba)[:, 1]
+        fpr, tpr, _ = roc_curve(y, probabilities)
+        roc_auc = auc(fpr, tpr)
+        roc_plotting_stuff.append((key, tpr, fpr, roc_auc))
+            
+    fig = plt.figure(dpi=250)
+    for key, tpr, fpr, auc_score in roc_plotting_stuff:
+        plt.plot(fpr, tpr, label=key+' (auc: %.2f)'%auc_score)
+    plt.legend(loc='lower right', fontsize=9)
+    plt.plot([0, 1], [0, 1], color='k', linestyle='--');
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("Comparing ROC Curves")
+    return fig

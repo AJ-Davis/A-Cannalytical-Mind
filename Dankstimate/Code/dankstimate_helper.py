@@ -187,7 +187,7 @@ def ts_feature(df):
 
 
 def content_feature(df):
-    content = pd.read_csv('/Users/ajdavis/Desktop/GitHub/A-Cannalytical-Mind/Dankstimate/Data/I_502.csv', encoding='iso-8859-1')
+    content = pd.read_csv('/Users/ajdavis/GitHub/A-Cannalytical-Mind/Dankstimate/Data/I_502.csv', encoding='iso-8859-1')
     mask = ['MatchedName', 'THCmax', 'CBDmax']
     content = content[mask]
     content = content.groupby(['MatchedName']).mean().reset_index()
@@ -391,6 +391,6 @@ def graph_predVSact(X, y, mod, xlim, ylim, xlab, ylab):
     ax.set_xlabel(xlab)
     ax.set_ylabel(ylab)
     fig = ax.get_figure()
-    fig.savefig('/Users/ajdavis/Desktop/GitHub/A-Cannalytical-Mind/Dankstimate/Images/predict_actual.jpg', bbox_inches = 'tight')
+    fig.savefig('/Users/ajdavis/GitHub/A-Cannalytical-Mind/Dankstimate/Images/predict_actual.jpg', bbox_inches = 'tight')
     return plt.show()
     

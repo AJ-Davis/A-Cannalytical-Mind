@@ -11,7 +11,7 @@ Created on Mon Jul  9 15:24:05 2018
 # =============================================================================
 
 import sys
-sys.path.insert(0, '/Users/ajdavis/Desktop/GitHub/A-Cannalytical-Mind/Dankstimate/Code')
+sys.path.insert(0, '/Users/ajdavis/GitHub/A-Cannalytical-Mind/Dankstimate/Code')
 
 from dankstimate_helper import *
 
@@ -50,7 +50,7 @@ price_zip = (weed_df_munge
 price_zip.columns = price_zip.columns.get_level_values(0)
 price_zip.columns = ['price', 'count']
 price_zip = (price_zip.loc[price_zip['count'] > 1000])
-price_zip.to_csv('/Users/ajdavis/Desktop/GitHub/A-Cannalytical-Mind/Dankstimate/Images/price_zip.csv')
+price_zip.to_csv('/Users/ajdavis/GitHub/A-Cannalytical-Mind/Dankstimate/Images/price_zip.csv')
 
 # prices by region
 price_region = (weed_df_munge
@@ -62,26 +62,26 @@ price_region = (weed_df_munge
 price_region.columns = price_region.columns.get_level_values(0)
 price_region.columns = ['price', 'count']
 price_region = (price_region.loc[price_region['count'] > 1000])
-price_region.to_csv('/Users/ajdavis/Desktop/GitHub/A-Cannalytical-Mind/Dankstimate/Images/price_region.csv')
+price_region.to_csv('/Users/ajdavis/GitHub/A-Cannalytical-Mind/Dankstimate/Images/price_region.csv')
 
 price_region.index.name = ''
 
 ax = price_region['price'].sort_values().tail(15).plot.barh(title='$/Gram by Region')
 fig = ax.get_figure()
-fig.savefig('/Users/ajdavis/Desktop/GitHub/A-Cannalytical-Mind/Dankstimate/Images/high_price.jpg', bbox_inches = 'tight')
+fig.savefig('/Users/ajdavis/GitHub/A-Cannalytical-Mind/Dankstimate/Images/high_price.jpg', bbox_inches = 'tight')
 
 ax = price_region['price'].sort_values(ascending=False).tail(15).plot.barh()
 fig = ax.get_figure()
-fig.savefig('/Users/ajdavis/Desktop/GitHub/A-Cannalytical-Mind/Dankstimate/Images/low_price.jpg', bbox_inches = 'tight')
+fig.savefig('/Users/ajdavis/GitHub/A-Cannalytical-Mind/Dankstimate/Images/low_price.jpg', bbox_inches = 'tight')
 
 ax = weed_df_munge['category_name'].value_counts().sort_values().plot.pie(title='Frequency of Sub Types', autopct='%1.0f%%')
 ax.set_ylabel('')
 fig = ax.get_figure()
-fig.savefig('/Users/ajdavis/Desktop/GitHub/A-Cannalytical-Mind/Dankstimate/Images/subtype.jpg', bbox_inches = 'tight')
+fig.savefig('/Users/ajdavis/GitHub/A-Cannalytical-Mind/Dankstimate/Images/subtype.jpg', bbox_inches = 'tight')
 
 ax = weed_df_munge['dname'].value_counts().sort_values().tail(15).plot.barh(title='Dispensaries with the Most Data')
 fig = ax.get_figure()
-fig.savefig('/Users/ajdavis/Desktop/GitHub/A-Cannalytical-Mind/Dankstimate/Images/dispensary.jpg', bbox_inches = 'tight')
+fig.savefig('/Users/ajdavis/GitHub/A-Cannalytical-Mind/Dankstimate/Images/dispensary.jpg', bbox_inches = 'tight')
 
 # =============================================================================
 # Feature Engineering
@@ -206,6 +206,7 @@ X_test_scale = scaler.transform(X_test)
 ## Check all models on training data
 
 grids = score_ht_models(X_train_scale, y_train, scoring = 'r2')
+
 
 # It's clear that randomForest is the best performing model
 # Now let's check for overfitting
